@@ -6,8 +6,9 @@
  */
 
 import React, {Fragment, useState} from 'react';
-//import DateTimePicker from '@react-native-community/datetimepicker';
-//import moment from 'moment';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import Overlay from 'react-native-elements';
+import moment from 'moment';
 import {
   SafeAreaView,
   ScrollView,
@@ -17,10 +18,27 @@ import {
   useColorScheme,
   View,
   TouchableOpacity,
-  Linking,
+  Platform,
 } from 'react-native';
 
 import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
+
+const state = {
+  dateString: moment(new Date()).format('YYYY-MM-DD'),
+  date: new Date(),
+  show: false,
+};
+
+const onChange = (event: any, selectedDate: any) => {
+  const changeDate = new Date(selectedDate);
+  links[0].time = changeDate.getHours();
+  state.show = false;
+  console.log(links[0].time);
+};
+
+const showOverlay = () => {
+  state.show = !state.show;
+};
 
 // Should be mutable by user
 let links = [
@@ -69,23 +87,6 @@ let links = [
 /*
 // Test for editing the period
 function updateTime(){
-  state = {
-    dateString: moment(new Date()).format('YYYY-MM-DD'),
-    date: new Date(),
-    show: false
-  };
-
-onChange = (event: any, selectedDate: any) => {
-    console.log(selectedDate)
-    this.setState({dateString: moment(selectedDate).format('YYYY-MM-DD'), date: selectedDate})
-  }
-showOverlay = () => {
-    this.setState({ show: true})
-  }
-hideOverlay = () => {
-    this.setState({ show: false})
-  }
-
     return (
        <View style={{ flex: 1, borderRadius: 100}}>
               <TouchableOpacity onPress={this.showOverlay} style={styles.inputContainerStyle}>
@@ -134,7 +135,7 @@ hideOverlay = () => {
 */
 
 // main function
-function App(): React.JSX.Element {
+function App(this: any): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
@@ -191,11 +192,11 @@ function App(): React.JSX.Element {
             style={{
               backgroundColor: isDarkMode ? Colors.black : Colors.white,
             }}>
-            {links.map(({id, title, link, timeLeft}) => (
+            {links.map(({id, title, timeLeft}) => (
               <Fragment key={id}>
                 <TouchableOpacity
                   accessibilityRole="button"
-                  onPress={() => Linking.openURL(link)}
+                  onPress={showOverlay}
                   style={linksStyles.linkContainer}>
                   <Text style={linksStyles.link}>{title}</Text>
                   <Text
@@ -211,6 +212,41 @@ function App(): React.JSX.Element {
               </Fragment>
             ))}
           </View>
+        </View>
+        <View style={{flex: 1, borderRadius: 100}}>
+          {Platform.OS === 'ios' ? (
+            <Overlay isVisible={state.show}>
+              <View>
+                <TouchableOpacity onPress={hideOverlay}>
+                  <Text style={{paddingHorizontal: 15}}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={hideOverlay}>
+                  <Text style={{paddingHorizontal: 15, color: 'green'}}>
+                    Done
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <DateTimePicker
+                value={state.date}
+                mode={'time'}
+                is24Hour={true}
+                onChange={onChange}
+                style={{backgroundColor: 'white'}}
+              />
+            </Overlay>
+          ) : (
+            <>
+              {state.show && (
+                <DateTimePicker
+                  value={state.date}
+                  mode={'time'}
+                  is24Hour={true}
+                  onChange={onChange}
+                  style={{backgroundColor: 'white'}}
+                />
+              )}
+            </>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
