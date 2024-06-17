@@ -6,11 +6,8 @@
  */
 
 import React, {Fragment, useState} from 'react';
-import type {PropsWithChildren} from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import moment from "moment";
+//import DateTimePicker from '@react-native-community/datetimepicker';
+//import moment from 'moment';
 import {
   SafeAreaView,
   ScrollView,
@@ -21,20 +18,9 @@ import {
   View,
   TouchableOpacity,
   Linking,
-  Button,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  time: number;
-}>;
+import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
 
 // Should be mutable by user
 let links = [
@@ -43,43 +29,45 @@ let links = [
     title: 'Wake up', // Link to wake up playlist
     link: 'https://reactnative.dev/docs/tutorial',
     time: 8,
-    timeLeft: "",
+    timeLeft: '',
     notified: false,
   },
   {
     id: 2,
-    title: 'Start study',  // Link to React Native doc
+    title: 'Start study', // Link to React Native doc
     link: 'https://reactnative.dev/docs/style',
     time: 10,
-    timeLeft: "",
+    timeLeft: '',
     notified: false,
   },
   {
     id: 3,
-    title: 'Lunch break',  // Link to open rice
+    title: 'Lunch break', // Link to open rice
     link: 'https://reactnative.dev/docs/flexbox',
     time: 12,
-    timeLeft: "",
+    timeLeft: '',
     notified: false,
   },
   {
     id: 5,
-    title: 'Tea time',  // Link to open rice
+    title: 'Tea time', // Link to open rice
     link: 'https://reactnative.dev/docs/components-and-apis',
     time: 15,
-    timeLeft: "",
+    timeLeft: '',
     notified: false,
   },
   {
     id: 4,
-    title: 'Done for the day',    // Link to Youtube
+    title: 'Done for the day', // Link to Youtube
     link: 'https://reactnative.dev/docs/components-and-apis',
     time: 18,
-    timeLeft: "",
+    timeLeft: '',
     notified: false,
   },
 ];
 
+/*
+// Test for editing the period
 function updateTime(){
   state = {
     dateString: moment(new Date()).format('YYYY-MM-DD'),
@@ -143,6 +131,7 @@ hideOverlay = () => {
             </View>
           );
 }
+*/
 
 // main function
 function App(): React.JSX.Element {
@@ -154,32 +143,36 @@ function App(): React.JSX.Element {
 
   const [displayText, setDisplayText] = useState(links);
   setInterval(() => {
-    const currentTime = Date.now()
-    const currentDate = new Date(currentTime)
-    const currentHour = currentDate.getHours()
-    var updateString = ""
-    var hourLeft = 0
-    var presetDate = 0
-    var loop = 0;
-    // The preset date should be 18:00:00 everyday
-    // We may make it mutable in the future.
+    const currentTime = Date.now();
+    const currentDate = new Date(currentTime);
+    const currentHour = currentDate.getHours();
+    var updateString = '';
+    var id = 0;
 
-     const updateText = displayText.map( blockInfo =>{
-        if(currentHour<links[loop].time) {
-           hourLeft = links[loop].time - (currentHour + 1)
-           presetDate  = new Date(currentDate.setHours(links[loop].time,0,0,0))
-           const recordedDate = new Date(presetDate - currentTime)
-           updateString =  "Time left"+"\n"+hourLeft+
-                           "hr "+recordedDate.getMinutes()+
-                           "mins "+recordedDate.getSeconds()+"sec"
-        } else {
-           updateString = "Done!!!"
-        }
-        links[loop].timeLeft = updateString
-        loop++
-     });
-     setDisplayText(updateText)
-    }, 1000);
+    const updateText = displayText.map(() => {
+      if (currentHour < links[id].time) {
+        const hourLeft = links[id].time - (currentHour + 1);
+        const presetDate = new Date(
+          currentDate.setHours(links[id].time, 0, 0, 0),
+        );
+        const recordedDate = new Date(presetDate - currentTime);
+        updateString =
+          'Time left' +
+          '\n' +
+          hourLeft +
+          'hr ' +
+          recordedDate.getMinutes() +
+          'mins ' +
+          recordedDate.getSeconds() +
+          'sec';
+      } else {
+        updateString = 'Done!!!';
+      }
+      links[id].timeLeft = updateString;
+      id++;
+    });
+    setDisplayText(updateText);
+  }, 1000);
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -189,35 +182,35 @@ function App(): React.JSX.Element {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <Header/>
+        <Header />
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-      <View style={{
-          backgroundColor: isDarkMode ? Colors.black : Colors.white,
-      }}>
-      {links.map(({id, title, link, timeLeft}) => (
-        <Fragment key={id}>
-          <TouchableOpacity
-            accessibilityRole="button"
-            onPress={() => Linking.openURL(link)}
-            style={linksStyles.linkContainer}>
-            <Text style={linksStyles.link}>{title}</Text>
-            <Text
-              style={[
-                linksStyles.description,
-                {
-                  color: isDarkMode ? Colors.white : Colors.black
-                  ,
-                },
-              ]}>
-              {timeLeft}
-            </Text>
-          </TouchableOpacity>
-        </Fragment>
-      ))}
-      </View>
+          <View
+            style={{
+              backgroundColor: isDarkMode ? Colors.black : Colors.white,
+            }}>
+            {links.map(({id, title, link, timeLeft}) => (
+              <Fragment key={id}>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  onPress={() => Linking.openURL(link)}
+                  style={linksStyles.linkContainer}>
+                  <Text style={linksStyles.link}>{title}</Text>
+                  <Text
+                    style={[
+                      linksStyles.description,
+                      {
+                        color: isDarkMode ? Colors.white : Colors.black,
+                      },
+                    ]}>
+                    {timeLeft}
+                  </Text>
+                </TouchableOpacity>
+              </Fragment>
+            ))}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -254,6 +247,7 @@ const linksStyles = StyleSheet.create({
   },
 });
 
+/*
 const styles = StyleSheet.create({
   sectionContainer: {
     marginTop: 32,
@@ -272,5 +266,5 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
-
+*/
 export default App;
