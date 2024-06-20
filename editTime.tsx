@@ -1,25 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Overlay from 'react-native-elements';
 import moment from 'moment';
-import links from './displayTime';
 import {Text, View, TouchableOpacity, Platform} from 'react-native';
+import {defaultValue} from './defaultTime';
 
 export const state = {
   dateString: moment(new Date()).format('YYYY-MM-DD'),
   date: new Date(),
+  id: 0,
   show: false,
 };
 
 const onChange = (event: any, selectedDate: any) => {
   const changeDate = new Date(selectedDate);
-  //links[2].hour = changeDate.getHours();
-  //links[2].minutes = changeDate.getMinutes();
+  defaultValue[state.id].hour = changeDate.getHours();
+  defaultValue[state.id].minutes = changeDate.getMinutes();
   state.show = false;
   console.log(changeDate.getHours() + ' ' + changeDate.getMinutes());
 };
 
-export const showPickerOverlay = () => {
+export const showPickerOverlay = (id: number) => {
+  state.id = id - 1;
   state.show = true;
 };
 
@@ -43,6 +45,7 @@ function EditTime(this: any): React.JSX.Element {
           <DateTimePicker
             value={state.date}
             mode={'time'}
+            display={'spinner'}
             is24Hour={true}
             onChange={onChange}
             style={{backgroundColor: 'white'}}
@@ -54,8 +57,9 @@ function EditTime(this: any): React.JSX.Element {
             <DateTimePicker
               value={state.date}
               mode={'time'}
-              is24Hour={true}
+              display={'spinner'}
               onChange={onChange}
+              is24Hour={true}
               style={{backgroundColor: 'white'}}
             />
           )}

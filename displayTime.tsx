@@ -2,6 +2,7 @@ import React, {Fragment, useState} from 'react';
 import type {Node} from 'react';
 import EditTime, {showPickerOverlay, state} from './editTime';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {defaultValue} from './defaultTime';
 import {
   Text,
   View,
@@ -10,61 +11,12 @@ import {
   useColorScheme,
 } from 'react-native';
 
-var myinterval: any;
-
-// Should be mutable by user
-export let links = [
-  {
-    id: 1,
-    title: 'Wake up', // Link to wake up playlist
-    link: 'https://reactnative.dev/docs/tutorial',
-    hour: 8,
-    minutes: 0,
-    timeLeft: '',
-    notified: false,
-  },
-  {
-    id: 2,
-    title: 'Start study', // Link to React Native doc
-    link: 'https://reactnative.dev/docs/style',
-    hour: 10,
-    minutes: 0,
-    timeLeft: '',
-    notified: false,
-  },
-  {
-    id: 3,
-    title: 'Lunch break', // Link to open rice
-    link: 'https://reactnative.dev/docs/flexbox',
-    hour: 12,
-    minutes: 0,
-    timeLeft: '',
-    notified: false,
-  },
-  {
-    id: 5,
-    title: 'Tea time', // Link to open rice
-    link: 'https://reactnative.dev/docs/components-and-apis',
-    hour: 15,
-    minutes: 0,
-    timeLeft: '',
-    notified: false,
-  },
-  {
-    id: 4,
-    title: 'Done for the day', // Link to Youtube
-    link: 'https://reactnative.dev/docs/components-and-apis',
-    hour: 18,
-    minutes: 0,
-    timeLeft: '',
-    notified: false,
-  },
-];
+var textCountDownInterval: any;
 
 const DisplayTime = (): Node => {
   const isDarkMode = useColorScheme() === 'dark';
-  const [displayText, setDisplayText] = useState(links);
-  myinterval = setInterval(() => {
+  const [displayText, setDisplayText] = useState(defaultValue);
+  textCountDownInterval = setInterval(() => {
     const currentTime = Date.now();
     const currentDate = new Date(currentTime);
     const currentHour = currentDate.getHours();
@@ -72,10 +24,15 @@ const DisplayTime = (): Node => {
     var id = 0;
 
     const updateText = displayText.map(() => {
-      if (currentHour < links[id].hour) {
-        const hourLeft = links[id].hour - (currentHour + 1);
+      if (currentHour < defaultValue[id].hour) {
+        const hourLeft = defaultValue[id].hour - (currentHour + 1);
         const presetDate = new Date(
-          currentDate.setHours(links[id].hour, links[id].minutes, 0, 0),
+          currentDate.setHours(
+            defaultValue[id].hour,
+            defaultValue[id].minutes,
+            0,
+            0,
+          ),
         );
         const recordedDate = new Date(presetDate - currentTime);
         updateString =
@@ -90,31 +47,31 @@ const DisplayTime = (): Node => {
       } else {
         updateString = 'Done!!!';
       }
-      links[id].timeLeft = updateString;
+      defaultValue[id].timeLeft = updateString;
       id++;
     });
     setDisplayText(updateText);
   }, 1000);
   if (state.show) {
-    clearInterval(myinterval);
+    clearInterval(textCountDownInterval);
   }
   return (
     <View
       style={{
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
       }}>
-      {links.map(({id, title, timeLeft}) => (
+      {defaultValue.map(({id, title, timeLeft}) => (
         <Fragment key={id}>
           <TouchableOpacity
             accessibilityRole="button"
             onPress={() => {
-              showPickerOverlay();
+              showPickerOverlay(id);
             }}
-            style={linksStyles.linkContainer}>
-            <Text style={linksStyles.link}>{title}</Text>
+            style={timeSlotStyles.linkContainer}>
+            <Text style={timeSlotStyles.link}>{title}</Text>
             <Text
               style={[
-                linksStyles.description,
+                timeSlotStyles.description,
                 {
                   color: isDarkMode ? Colors.white : Colors.black,
                 },
@@ -127,9 +84,9 @@ const DisplayTime = (): Node => {
       <EditTime />
     </View>
   );
-}
+};
 
-const linksStyles = StyleSheet.create({
+const timeSlotStyles = StyleSheet.create({
   container: {
     marginTop: 32,
     paddingHorizontal: 24,
@@ -153,9 +110,6 @@ const linksStyles = StyleSheet.create({
     textAlign: 'right',
     fontWeight: '400',
     fontSize: 18,
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
   },
 });
 
